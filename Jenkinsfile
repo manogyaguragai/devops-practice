@@ -1,12 +1,15 @@
 pipeline {
     agent any
+    environment {
+        DOCKER_COMPOSE_CMD = "docker compose" // Ensure correct compose command
+    }
     stages {
-        stage("verifying tooling") {
+        stage("Verifying Tooling") {
             steps {
                 sh '''
                     docker --version 
-                    sudo docker info
-                    sudo docker compose version
+                    docker info
+                    docker compose version
                     curl --version
                     jq --version
                 '''
@@ -14,13 +17,13 @@ pipeline {
         }
         stage("Prune Docker Data") {
             steps {
-                sh 'sudo docker system prune -a --volumes -f'
+                sh 'docker system prune -a --volumes -f'
             }
         }
         stage("Start Container") {
-            steps{
-                sh 'sudo docker compose up -d --no-color --wait'
-                sh 'sudo docker compose ps'
+            steps {
+                sh '${DOCKER_COMPOSE_CMD} up -d --no-color'
+                sh '${DOCKER_COMPOSE_CMD} ps'
             }
         }
     }
